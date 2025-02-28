@@ -27,7 +27,7 @@ public class FrmCajaRegistradora extends JFrame {
 
     // metodo constructor
     public FrmCajaRegistradora() {
-        setSize(400, 450);
+        setSize(400, 400);
         setTitle("Caja Registradora");
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         getContentPane().setLayout(null);
