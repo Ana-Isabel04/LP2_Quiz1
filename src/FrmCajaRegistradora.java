@@ -10,29 +10,30 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.WindowConstants;
 import javax.swing.table.DefaultTableModel;
 
 public class FrmCajaRegistradora extends JFrame {
     JTable tblTablaDevolucion;
+    DefaultTableModel datosDevueltaTabla;
     JComboBox cmbOpciones;
     JTextField txtCantidad;
     JTextField txtCantDevolucion;
+    JTextField txtValorSaldo;
 
     Integer[] opciones = new Integer[] { 100000, 50000, 20000, 10000, 5000, 2000, 1000, 500, 200, 100, 50 };
     String[] encabezados = new String[] { "Cantidad", "Presentación", "Denominción" };
 
     // metodo constructor
     public FrmCajaRegistradora() {
-        setSize(500, 400);
+        setSize(400, 450);
         setTitle("Caja Registradora");
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         getContentPane().setLayout(null);
 
         JLabel LabelDenomimacion = new JLabel("Denominación");
-        LabelDenomimacion.setBounds(10, 10, 250, 50);
+        LabelDenomimacion.setBounds(10, 10, 250, 25);
         getContentPane().add(LabelDenomimacion);
 
         cmbOpciones = new JComboBox();
@@ -66,21 +67,8 @@ public class FrmCajaRegistradora extends JFrame {
         spTablaDevolucion.setBounds(10, 150, 350, 200);
         getContentPane().add(spTablaDevolucion);
 
-        // falta poner encabezado de la tabla
-        DefaultTableModel datosDevueltaTabla = new DefaultTableModel(null, encabezados);
+        datosDevueltaTabla = new DefaultTableModel(new Object[][] {}, encabezados);
         tblTablaDevolucion.setModel(datosDevueltaTabla);
-
-        JTextArea txtSaldo = new JTextArea("Tienes un saldo a favor");
-        txtSaldo.setBounds(10, 350, 250, 50);
-        txtSaldo.setEditable(false);
-        txtSaldo.setOpaque(false);
-        txtSaldo.setLineWrap(true);
-        getContentPane().add(txtSaldo);
-
-        JTextField txtValorSaldo = new JTextField();
-        txtValorSaldo.setBounds(150, 350, 100, 25);
-        txtValorSaldo.setEnabled(false);
-        getContentPane().add(txtValorSaldo);
 
         btnActualizar.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -102,17 +90,17 @@ public class FrmCajaRegistradora extends JFrame {
 
     private void actualizarCaja() {
         try {
-            int Selectdenominacion = (int) cmbOpciones.getSelectedItem(); 
-            int cantidad = Integer.parseInt(txtCantidad.getText().trim()); 
-    
+            int Selectdenominacion = (int) cmbOpciones.getSelectedItem();
+            int cantidad = Integer.parseInt(txtCantidad.getText().trim());
+
             if (cantidad < 0) {
                 JOptionPane.showMessageDialog(null, "Debe ingresar un número positivo.");
                 return;
             }
-    
+
             for (int i = 0; i < opciones.length; i++) {
                 if (opciones[i] == Selectdenominacion) {
-                    CantidadBilletes[i] = cantidad; 
+                    CantidadBilletes[i] = cantidad;
                     JOptionPane.showMessageDialog(null, "Cantidad actualizada correctamente.");
                     txtCantidad.setText("");
                     return;
@@ -123,9 +111,103 @@ public class FrmCajaRegistradora extends JFrame {
             JOptionPane.showMessageDialog(null, "Debe digitar un valor numérico válido.");
         }
     }
-    
 
     private void Devolucion() {
+        try {
 
+            
+            int cantidad = Integer.parseInt(txtCantDevolucion.getText().trim());
+            int modulo = cantidad % 10000;
+            int moduloPesos = cantidad % 1000;
+            int valor = cantidad - modulo;
+            datosDevueltaTabla.setRowCount(0);
+
+            devolverMiles(valor);
+            devolverPesos(modulo);
+            devolverMonedas(moduloPesos);
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Error: " + e.getMessage());
+        }
     }
-}
+    
+    private void devolverMiles(int valor) {
+        int acumulador = 0;
+        for (int i = 0; i <= 3; i++) { 
+            int billete = opciones[i];
+    
+            while (acumulador + billete <= valor) {
+                boolean encontrado = false;
+    
+                for (int j = 0; j < datosDevueltaTabla.getRowCount(); j++) {
+                    if ((int) datosDevueltaTabla.getValueAt(j, 2) == billete) {
+                        int cantidadExistente = (int) datosDevueltaTabla.getValueAt(j, 0);
+                        datosDevueltaTabla.setValueAt(cantidadExistente + 1, j, 0);
+                        encontrado = true;
+                        break;
+                    }
+                }
+    
+                if (!encontrado) {
+                    datosDevueltaTabla.addRow(new Object[]{1, "billete", billete});
+                }
+    
+                acumulador += billete;
+            }
+        }
+    }
+    
+    private void devolverPesos(int modulo) {
+        int acumuladorPesos = 0;
+    
+        for (int i = 3; i <= 5; i++) { 
+            int billete = opciones[i];
+    
+            while (acumuladorPesos + billete <= modulo) {
+                boolean encontrado = false;
+    
+                for (int j = 0; j < datosDevueltaTabla.getRowCount(); j++) {
+                    if ((int) datosDevueltaTabla.getValueAt(j, 2) == billete) {
+                        int cantidadExistente = (int) datosDevueltaTabla.getValueAt(j, 0);
+                        datosDevueltaTabla.setValueAt(cantidadExistente + 1, j, 0);
+                        encontrado = true;
+                        break;
+                    }
+                }
+    
+                if (!encontrado) {
+                    datosDevueltaTabla.addRow(new Object[]{1, "billete", billete});
+                }
+    
+                acumuladorPesos += billete;
+            }
+        }
+    }
+    
+    private void devolverMonedas(int moduloPesos) {
+        int acumuladorMonedas = 0;
+    
+        for (int i = 6; i < opciones.length; i++) { 
+            int moneda = opciones[i];
+    
+            while (acumuladorMonedas + moneda <= moduloPesos) {
+                boolean encontrado = false;
+    
+                for (int j = 0; j < datosDevueltaTabla.getRowCount(); j++) {
+                    if ((int) datosDevueltaTabla.getValueAt(j, 2) == moneda) {
+                        int cantidadExistente = (int) datosDevueltaTabla.getValueAt(j, 0);
+                        datosDevueltaTabla.setValueAt(cantidadExistente + 1, j, 0);
+                        encontrado = true;
+                        break;
+                    }
+                }
+    
+                if (!encontrado) {
+                    datosDevueltaTabla.addRow(new Object[]{1, "moneda", moneda});
+                }
+    
+                acumuladorMonedas += moneda;
+            }
+        }
+    }
+}   
