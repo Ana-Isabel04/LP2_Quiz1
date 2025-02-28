@@ -123,7 +123,6 @@ public class FrmCajaRegistradora extends JFrame {
             datosDevueltaTabla.setRowCount(0);
 
             devolverMiles(valor);
-            devolverPesos(modulo);
             devolverMonedas(moduloPesos);
         } catch (Exception e) {
             e.printStackTrace();
@@ -133,10 +132,10 @@ public class FrmCajaRegistradora extends JFrame {
     
     private void devolverMiles(int valor) {
         int acumulador = 0;
-        for (int i = 0; i <= 3; i++) { 
+        for (int i = 0; i <= 5; i++) { 
             int billete = opciones[i];
     
-            while (acumulador + billete <= valor) {
+            while (acumulador + billete <= valor && CantidadBilletes[i] > 0) {
                 boolean encontrado = false;
     
                 for (int j = 0; j < datosDevueltaTabla.getRowCount(); j++) {
@@ -153,36 +152,12 @@ public class FrmCajaRegistradora extends JFrame {
                 }
     
                 acumulador += billete;
+                CantidadBilletes[i]--;
             }
         }
     }
     
-    private void devolverPesos(int modulo) {
-        int acumuladorPesos = 0;
     
-        for (int i = 3; i <= 5; i++) { 
-            int billete = opciones[i];
-    
-            while (acumuladorPesos + billete <= modulo) {
-                boolean encontrado = false;
-    
-                for (int j = 0; j < datosDevueltaTabla.getRowCount(); j++) {
-                    if ((int) datosDevueltaTabla.getValueAt(j, 2) == billete) {
-                        int cantidadExistente = (int) datosDevueltaTabla.getValueAt(j, 0);
-                        datosDevueltaTabla.setValueAt(cantidadExistente + 1, j, 0);
-                        encontrado = true;
-                        break;
-                    }
-                }
-    
-                if (!encontrado) {
-                    datosDevueltaTabla.addRow(new Object[]{1, "billete", billete});
-                }
-    
-                acumuladorPesos += billete;
-            }
-        }
-    }
     
     private void devolverMonedas(int moduloPesos) {
         int acumuladorMonedas = 0;
@@ -190,7 +165,7 @@ public class FrmCajaRegistradora extends JFrame {
         for (int i = 6; i < opciones.length; i++) { 
             int moneda = opciones[i];
     
-            while (acumuladorMonedas + moneda <= moduloPesos) {
+            while (acumuladorMonedas + moneda <= moduloPesos && CantidadBilletes[i] > 0) {
                 boolean encontrado = false;
     
                 for (int j = 0; j < datosDevueltaTabla.getRowCount(); j++) {
@@ -207,6 +182,7 @@ public class FrmCajaRegistradora extends JFrame {
                 }
     
                 acumuladorMonedas += moneda;
+                CantidadBilletes[i]--;
             }
         }
     }
