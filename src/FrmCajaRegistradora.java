@@ -101,20 +101,31 @@ public class FrmCajaRegistradora extends JFrame {
     int[] CantidadBilletes = new int[10];
 
     private void actualizarCaja() {
-        String Denominaciones =  String.valueOf(cmbOpciones.getSelectedIndex()); 
-        for (int i=1;i<opciones.length;i++){
-            try{
-            if (opciones[i]==Denominaciones){
-                int dato = Integer.parseInt(txtCantidad.getText());
-                CantidadBilletes[i]=dato;
-                }
-            }catch(Exception ex) {
-                JOptionPane.showMessageDialog(null, "Debe digitar un valor numérico");
-
+        try {
+            int Selectdenominacion = (int) cmbOpciones.getSelectedItem(); 
+            int cantidad = Integer.parseInt(txtCantidad.getText().trim()); 
+    
+            if (cantidad < 0) {
+                JOptionPane.showMessageDialog(null, "Debe ingresar un número positivo.");
+                return;
             }
-   }
+    
+            for (int i = 0; i < opciones.length; i++) {
+                if (opciones[i] == Selectdenominacion) {
+                    CantidadBilletes[i] = cantidad; 
+                    JOptionPane.showMessageDialog(null, "Cantidad actualizada correctamente.");
+                    txtCantidad.setText("");
+                    return;
+                }
+            }
+        } catch (Exception ex) {
+            txtCantidad.setText("");
+            JOptionPane.showMessageDialog(null, "Debe digitar un valor numérico válido.");
+        }
+    }
+    
 
     private void Devolucion() {
-       
+
     }
 }
