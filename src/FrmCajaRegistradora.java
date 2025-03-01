@@ -122,7 +122,7 @@ public class FrmCajaRegistradora extends JFrame {
 
             for (int i = 0; i < opciones.length; i++) {
                 int denominacion = opciones[i];
-                String tipo = (denominacion >= 1000) ? "billete" : "moneda";
+                String tipo = (denominacion > 1000) ? "billete" : "moneda";
 
                 while (acumulador + denominacion <= cantidad && CantidadBilletes[i] > 0) {
                     boolean encontrado = false;
@@ -153,7 +153,7 @@ public class FrmCajaRegistradora extends JFrame {
             }
 
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, "Error en la entrada de datos.");
+            JOptionPane.showMessageDialog(null, "Por favor ingrese un numero.");
         }
     }
 
