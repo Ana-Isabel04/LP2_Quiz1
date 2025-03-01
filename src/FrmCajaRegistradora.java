@@ -114,76 +114,37 @@ public class FrmCajaRegistradora extends JFrame {
 
     private void Devolucion() {
         try {
-
-            
             int cantidad = Integer.parseInt(txtCantDevolucion.getText().trim());
-            int modulo = cantidad % 10000;
-            int moduloPesos = cantidad % 1000;
-            int valor = cantidad - modulo;
-            datosDevueltaTabla.setRowCount(0);
-
-            devolverMiles(valor);
-            devolverMonedas(moduloPesos);
+            datosDevueltaTabla.setRowCount(0); 
+    
+            int acumulador = 0;
+    
+            for (int i = 0; i < opciones.length; i++) { 
+                int denominacion = opciones[i];
+                String tipo = (denominacion >= 1000) ? "billete" : "moneda";
+    
+                while (acumulador + denominacion <= cantidad && CantidadBilletes[i] > 0) {
+                    boolean encontrado = false;
+    
+                    for (int j = 0; j < datosDevueltaTabla.getRowCount(); j++) {
+                        if ((int) datosDevueltaTabla.getValueAt(j, 2) == denominacion) {
+                            int cantidadExistente = (int) datosDevueltaTabla.getValueAt(j, 0);
+                            datosDevueltaTabla.setValueAt(cantidadExistente + 1, j, 0);
+                            encontrado = true;
+                            break;
+                        }
+                    }
+    
+                    if (!encontrado) {
+                        datosDevueltaTabla.addRow(new Object[]{1, tipo, denominacion});
+                    }
+    
+                    acumulador += denominacion;
+                    CantidadBilletes[i]--;
+                }
+            }
         } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("Error: " + e.getMessage());
-        }
-    }
-    
-    private void devolverMiles(int valor) {
-        int acumulador = 0;
-        for (int i = 0; i <= 5; i++) { 
-            int billete = opciones[i];
-    
-            while (acumulador + billete <= valor && CantidadBilletes[i] > 0) {
-                boolean encontrado = false;
-    
-                for (int j = 0; j < datosDevueltaTabla.getRowCount(); j++) {
-                    if ((int) datosDevueltaTabla.getValueAt(j, 2) == billete) {
-                        int cantidadExistente = (int) datosDevueltaTabla.getValueAt(j, 0);
-                        datosDevueltaTabla.setValueAt(cantidadExistente + 1, j, 0);
-                        encontrado = true;
-                        break;
-                    }
-                }
-    
-                if (!encontrado) {
-                    datosDevueltaTabla.addRow(new Object[]{1, "billete", billete});
-                }
-    
-                acumulador += billete;
-                CantidadBilletes[i]--;
-            }
-        }
-    }
-    
-    
-    
-    private void devolverMonedas(int moduloPesos) {
-        int acumuladorMonedas = 0;
-    
-        for (int i = 6; i < opciones.length; i++) { 
-            int moneda = opciones[i];
-    
-            while (acumuladorMonedas + moneda <= moduloPesos && CantidadBilletes[i] > 0) {
-                boolean encontrado = false;
-    
-                for (int j = 0; j < datosDevueltaTabla.getRowCount(); j++) {
-                    if ((int) datosDevueltaTabla.getValueAt(j, 2) == moneda) {
-                        int cantidadExistente = (int) datosDevueltaTabla.getValueAt(j, 0);
-                        datosDevueltaTabla.setValueAt(cantidadExistente + 1, j, 0);
-                        encontrado = true;
-                        break;
-                    }
-                }
-    
-                if (!encontrado) {
-                    datosDevueltaTabla.addRow(new Object[]{1, "moneda", moneda});
-                }
-    
-                acumuladorMonedas += moneda;
-                CantidadBilletes[i]--;
-            }
+            JOptionPane.showMessageDialog(null, "No hay existencia");
         }
     }
 }   
