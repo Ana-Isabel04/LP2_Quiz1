@@ -86,7 +86,7 @@ public class FrmCajaRegistradora extends JFrame {
 
     }
 
-    int[] CantidadBilletes = new int[10];
+    int[] CantidadBilletes = new int[opciones.length];
 
     private void actualizarCaja() {
         try {
@@ -115,17 +115,18 @@ public class FrmCajaRegistradora extends JFrame {
     private void Devolucion() {
         try {
             int cantidad = Integer.parseInt(txtCantDevolucion.getText().trim());
-            datosDevueltaTabla.setRowCount(0); 
-    
+            datosDevueltaTabla.setRowCount(0);
+
             int acumulador = 0;
-    
-            for (int i = 0; i < opciones.length; i++) { 
+            boolean EntregoCambio = false;
+
+            for (int i = 0; i < opciones.length; i++) {
                 int denominacion = opciones[i];
                 String tipo = (denominacion >= 1000) ? "billete" : "moneda";
-    
+
                 while (acumulador + denominacion <= cantidad && CantidadBilletes[i] > 0) {
                     boolean encontrado = false;
-    
+
                     for (int j = 0; j < datosDevueltaTabla.getRowCount(); j++) {
                         if ((int) datosDevueltaTabla.getValueAt(j, 2) == denominacion) {
                             int cantidadExistente = (int) datosDevueltaTabla.getValueAt(j, 0);
@@ -134,17 +135,26 @@ public class FrmCajaRegistradora extends JFrame {
                             break;
                         }
                     }
-    
+
                     if (!encontrado) {
-                        datosDevueltaTabla.addRow(new Object[]{1, tipo, denominacion});
+                        datosDevueltaTabla.addRow(new Object[] { 1, tipo, denominacion });
                     }
-    
+
                     acumulador += denominacion;
                     CantidadBilletes[i]--;
+                    EntregoCambio = true;
                 }
             }
+
+            if (!EntregoCambio) {
+                JOptionPane.showMessageDialog(null, "No hay existencia de billetes o monedas disponibles.");
+            } else if (acumulador < cantidad) {
+                JOptionPane.showMessageDialog(null, "No hay suficiente existencia para completar el valor.");
+            }
+
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, "No hay existencia");
+            JOptionPane.showMessageDialog(null, "Error en la entrada de datos.");
         }
     }
-}   
+
+}
